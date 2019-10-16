@@ -1,62 +1,51 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg">
+            <b-form-input size="bg" class="mr-sm-2" placeholder="Search" v-model="search"></b-form-input>
+          </div>
+          <div>
+            <b-button size="bg"  @click="SearchWord">Search</b-button>
+          </div>
+        </div>
+      </div>
+    <div v-if="podaci">
+    <post-container-vue  v-for="item in podaci" :key="item.defid" :post="item"></post-container-vue>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import PostContainerVue from './components/PostContainer.vue';
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    PostContainerVue
   },
   data: function() {
     return {
-      podaci: "The only [proper] [response] to something that makes absolutely [no sense].",
-      result:"",
-      podacilink:""
+      podaci: "",
+      search:""
     };
   },
   methods:{
-    toLink:function(){
-      var patt = /\[(.*?)\]/g;
-      var result = this.podaci.match(patt);
-      this.result=result;
-      var prefix = "<a href='";
-      var mid = "'>";
-      var sufix = "</a>";
-      var link="";
-      var links=[];
-      for(let i=0;i<result.length;i++)
-      {
-        result[i]=result[i].slice(1,result[i].length-1);
-        links.push(prefix+link+mid+result[i]+sufix);
-      }
-      for(let i=0;i<links.length;i++)
-      {
-        let tmpPodaci = this.podaci.replace(/\[(.*?)\]/, links[i]);
-        this.podaci = tmpPodaci;
-      }
-    }
-  },
-  mounted() {
-    fetch(
-      "https://andruxnet-random-famous-quotes.p.rapidapi.com/?cat=movies&count=10",
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": "andruxnet-random-famous-quotes.p.rapidapi.com",
+    SearchWord:function(){
+      fetch(`https://mashape-community-urban-dictionary.p.rapidapi.com/define?term=${this.search}`, {
+        "method": "GET",
+        "headers": {
+          "x-rapidapi-host": "mashape-community-urban-dictionary.p.rapidapi.com",
           "x-rapidapi-key": "3ad5e9566emsh12b9dd01eb2e595p10f4e7jsnca728172e1ea"
         }
-      }
-    )
-      .then(response => response.json())
-      .then(jsonData => {
-        this.podaci = jsonData;
-      });
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(JSONdata=>{
+        this.podaci=JSONdata.list;
+      })
+    }
   }
 }
 </script>
